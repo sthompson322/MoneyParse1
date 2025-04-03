@@ -15,6 +15,9 @@
     <!-- Header -->
     <nav class="p-3 navbar navbar-dark bg-success navbar-expand-lg">
       <div class="container">
+        <a class="navbar-brand" href="#">
+          <img src="{% static 'image/logo.png' %}" alt="Money Parse" style="width: 100px; height: auto;">
+        </a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup"
           aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
           <span class="navbar-toggler-icon"></span>
@@ -23,6 +26,9 @@
           <div class="navbar-nav ms-auto navbar-ml">
             <a class="nav-link" href="{% url 'home.index' %}">Home</a>
             <a class="nav-link" href="{% url 'home.about' %}">About</a>
+            <a class="nav-link" href="{% url 'home.reports' %}">Reports</a>
+            <a class="nav-link" href="{% url 'home.budget' %}">My Budget</a>
+            <a class="nav-link" href="{% url 'home.profile' %}">Profile</a>
             <div class="vr bg-white mx-2 d-none d-lg-block"></div>
             {% if user.is_authenticated %}
             <a class="nav-link" href="{% url 'accounts.logout' %}">Logout ({{ user.username }})</a>
