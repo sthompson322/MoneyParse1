@@ -1,7 +1,48 @@
 {% extends 'base.html' %}
-
-{% block title %}About{% endblock %}
-
 {% block content %}
-<h1>About MoneyParse</h1>
-{% endblock %}
+{% load static %}
+<div class="p-3">
+  <div class="container">
+    <div class="row mt-3">
+      <div class="col-md-6 mx-auto mb-3">
+        <h2>About</h2>
+        <hr />
+        <p>
+            Money Parse is a user-friendly financial
+            tracking tool designed to help you
+            understand, manage, and optimize your money
+            with ease. Whether it's budgeting, expense
+            tracking, or analyzing financial trends,
+            Money Parse is your all-in-one solution
+            for managing your finances effectively.
+        </p>
+        <p>
+            Discover the convenience of our digital platform,
+            where you can effortlessly record expenses,
+            categorize transactions, and generate financial
+            reports. More than just a tracker, Money Parse
+            provides personalized financial insights based on
+            your spending habits, helping you make informed
+            decisions. It's like having a financial companion
+            dedicated to helping you save money. Join us in
+            making smarter money moves!
+        </p>
+          <p>
+              At Money Parse, we believe that financial
+              assistance should be accessible to
+              everyone- completely free of charge. Our
+              goal is to provide an intuitive and powerful
+              tool that empowers users to achieve financial
+              stability and  make better financial decisions.
+          </p>
+      </div>
+      <div class="col-md-6 mx-auto mb-3 text-center">
+        <img src="{% static 'image/about.jpg' %}"
+             class="img-fluid"
+             style="max-width: 80%; height: auto;"
+             alt="about" />
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock content %}
