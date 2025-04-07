@@ -1,4 +1,7 @@
 from django.shortcuts import render
+from django.http import JsonResponse
+from .gemini_chat import get_gemini_response
+
 
 # Create your views here.
 def index(request):
@@ -14,9 +17,12 @@ def about(request):
                   'home/about.html',
                   {'template_data': template_data})
 
-def reports(request):
-    return render(request, 'home/reports.html')
-def budget(request):
-    return render(request, 'home/budget.html')
 def profile(request):
     return render(request, 'home/profile.html')
+
+def chatbot_view(request):
+    if request.method == "POST":
+        user_input = request.POST.get("message", "")
+        response = get_gemini_response(user_input)
+        return JsonResponse({"response": response})
+    return render(request, "home/chatbot.html")

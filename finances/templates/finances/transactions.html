@@ -1,0 +1,98 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container mt-5">
+    <h2 class="text-center mb-4">Add Your Transactions</h2>
+    <form method="post" id="transaction-form">
+        {% csrf_token %}
+        {{ formset.management_form }}
+
+        <div id="formset-container">
+            {% for form in formset %}
+                <div class="formset-form border rounded p-3 mb-3 position-relative bg-light">
+                    <button type="button" class="btn-close position-absolute top-0 end-0 remove-form" aria-label="Close"></button>
+                    <div class="row g-3">
+                        <div class="col-md-2">
+                            {{ form.type.label_tag }} {{ form.type }}
+                        </div>
+                        <div class="col-md-2">
+                            {{ form.amount.label_tag }} {{ form.amount }}
+                        </div>
+                        <div class="col-md-2">
+                            {{ form.category.label_tag }} {{ form.category }}
+                        </div>
+                        <div class="col-md-3">
+                            {{ form.with_who_or_what.label_tag }} {{ form.with_who_or_what }}
+                        </div>
+                        <div class="col-md-3">
+                            {{ form.date.label_tag }} {{ form.date }}
+                        </div>
+                        {{ form.DELETE.as_hidden }}
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+
+        <div class="text-center my-4">
+            <button type="button" class="btn btn-outline-primary" id="add-form">+ Add Another</button>
+        </div>
+
+        <div class="text-center mt-4 mb-5">
+            <button type="submit" class="btn btn-success px-4 py-2">Save Transactions</button>
+        </div>
+    </form>
+</div>
+
+<script type="text/template" id="empty-form-template">
+    <div class="formset-form border rounded p-3 mb-3 position-relative bg-light">
+        <button type="button" class="btn-close position-absolute top-0 end-0 remove-form" aria-label="Close"></button>
+        <div class="row g-3">
+            <div class="col-md-2">
+                {{ formset.empty_form.type.label_tag }} {{ formset.empty_form.type }}
+            </div>
+            <div class="col-md-2">
+                {{ formset.empty_form.amount.label_tag }} {{ formset.empty_form.amount }}
+            </div>
+            <div class="col-md-2">
+                {{ formset.empty_form.category.label_tag }} {{ formset.empty_form.category }}
+            </div>
+            <div class="col-md-3">
+                {{ formset.empty_form.with_who_or_what.label_tag }} {{ formset.empty_form.with_who_or_what }}
+            </div>
+            <div class="col-md-3">
+                {{ formset.empty_form.date.label_tag }} {{ formset.empty_form.date }}
+            </div>
+            {{ formset.empty_form.DELETE }}
+        </div>
+    </div>
+</script>
+
+<script>
+    const formsetContainer = document.getElementById('formset-container');
+    const addButton = document.getElementById('add-form');
+    let totalForms = document.getElementById('id_form-TOTAL_FORMS');
+
+    addButton.addEventListener('click', () => {
+        const formCount = parseInt(totalForms.value);
+        const template = document.getElementById('empty-form-template').innerHTML;
+        const newFormHtml = template.replace(/__prefix__/g, formCount);
+        formsetContainer.insertAdjacentHTML('beforeend', newFormHtml);
+        totalForms.value = formCount + 1;
+        updateRemoveButtons();
+    });
+
+    function updateRemoveButtons() {
+        document.querySelectorAll('.remove-form').forEach(btn => {
+            btn.onclick = () => {
+                const formDiv = btn.closest('.formset-form');
+                const deleteCheckbox = formDiv.querySelector('input[type="checkbox"][name$="DELETE"]');
+                if (deleteCheckbox) {
+                    deleteCheckbox.checked = true;
+                }
+                formDiv.style.display = 'none';
+            };
+        });
+    }
+
+    updateRemoveButtons();
+</script>
+{% endblock %}

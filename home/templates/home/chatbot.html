@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+<div id="chatbox">
+    <h2>Type any finance-related question below for personalized advice!</h2>
+    <form id="chat-form">
+        {% csrf_token %}
+        <div id="messages"></div>
+        <input type="text" id="user-input" placeholder="Ask me a financial question..." />
+        <button type="button" onclick="sendMessage()">Send</button>
+    </form>
+</div>
+
+<script>
+    function sendMessage() {
+        const inputField = document.getElementById("user-input");
+        const input = inputField.value.trim();
+        if (!input) return;
+
+        const messages = document.getElementById("messages");
+        messages.innerHTML += `<div class="msg user"><strong>You:</strong> ${input}</div>`;
+
+        fetch("{% url 'home.chatbot' %}", {
+            method: "POST",
+            headers: {
+                "X-CSRFToken": "{{ csrf_token }}",
+                "Content-Type": "application/x-www-form-urlencoded"
+            },
+            body: "message=" + encodeURIComponent(input)
+        })
+        .then(response => response.json())
+        .then(data => {
+            messages.innerHTML += `
+                <div class="msg bot">
+                    <strong>MoneyParseBot:</strong>
+                    <div class="bot-response">${data.response}</div>
+                </div>`;
+            messages.scrollTop = messages.scrollHeight;
+            inputField.value = "";
+        });
+    }
+
+    document.getElementById("user-input").addEventListener("keypress", function(event) {
+        if (event.key === "Enter") {
+            event.preventDefault();
+            sendMessage();
+        }
+    });
+</script>
+{% endblock content %}

@@ -37,8 +37,10 @@ def security(request):
             security.securityAnswer1 = request.POST['securityAnswer1']
             security.securityAnswer2 = request.POST['securityAnswer2']
             security.save()
-            return redirect('accounts.login')
-        except:
+            auth_login(request, user)
+
+            return redirect('finances.income')  # 🔁 Expected redirect
+        except Exception as e:
             return render(request, 'accounts/security.html', {'template_data': template_data})
     else:
         return render(request, 'accounts/security.html', {'template_data': template_data})
