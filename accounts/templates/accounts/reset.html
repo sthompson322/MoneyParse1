@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="p-3 mt-4">
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-md-8">
+        <div class="card-body">
+          <h2>Reset Password</h2>
+          <hr />
+          {% if template_data.error %}
+          <div class="alert alert-danger" role="alert">
+            {{ template_data.error }}
+          </div>
+          {% endif %}
+
+          <form method="POST">
+            {% csrf_token %}
+
+            <p>
+              <label for="username">Username</label>
+              <input id="username" type="text" name="username" required
+                     autocomplete="username" class="form-control">
+            </p>
+
+            <p>
+              <label for="newpassword">New Password</label>
+              <input id="newpassword" type="password" name="newpassword" required
+                  autocomplete="newpassword" class="form-control">
+            </p>
+
+            <p>
+              <label for="newpassword2">Re-type New Password</label>
+              <input id="newpassword2" type="password" name="newpassword2" required
+                  autocomplete="newpassword2" class="form-control">
+            </p>
+
+            <p>
+              <label for="securityAnswer1" class="form-label">Security Question 1: What city were you born in?</label>
+              <input type="text" id="securityAnswer1" name="securityAnswer1" required class="form-control">
+            </p>
+
+            <p>
+              <label for="securityAnswer2" class="form-label">Security Question 2: What is your mother's maiden name?</label>
+              <input type="text" id="securityAnswer2" name="securityAnswer2" required class="form-control">
+            </p>
+
+            <div class="text-center">
+              <button type="submit" class="btn bg-success text-white">Reset Password</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock content %}
