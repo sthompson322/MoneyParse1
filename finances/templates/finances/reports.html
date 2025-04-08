@@ -1,18 +1,62 @@
+<!-- templates/finances/reports.html -->
 {% extends 'base.html' %}
+
 {% block content %}
-<header class="masthead bg-index text-black text-center
-           py-4">
-  <div class="container d-flex align-items-center flex-
-  column pt-2">
-  </div>
-</header>
-<div class="p-3">
-  <div class="container">
-    <div class="row mt-3">
-      <div class="col mx-auto text-center mb-3">
-        <h4>Financial Reports</h4>
-      </div>
+<div class="container mt-4">
+    <!-- Navigation Section -->
+    <div class="d-flex justify-content-between mb-4">
+        <h2>Budget Reports</h2>
+        <div>
+            <a href="{% url 'finances.budget' %}" class="btn btn-outline-primary me-2">
+                ← Back to Budgets
+            </a>
+        </div>
     </div>
-  </div>
+
+    <!-- Graph Container -->
+    <div class="card">
+        <div class="card-body">
+            <canvas id="budgetChart" height="400"></canvas>
+        </div>
+    </div>
 </div>
-{% endblock content %}
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const ctx = document.getElementById('budgetChart').getContext('2d');
+    new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: {{ chart_data.labels|safe }},
+            datasets: [
+                {
+                    label: 'Budget Limits',
+                    data: {{ chart_data.limits|safe }},
+                    backgroundColor: 'rgba(54, 162, 235, 0.5)'
+                },
+                {
+                    label: 'Amount Spent',
+                    data: {{ chart_data.spent|safe }},
+                    backgroundColor: 'rgba(255, 99, 132, 0.5)'
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        callback: function(value) {
+                            return '$' + value;
+                        }
+                    }
+                }
+            }
+        }
+    });
+});
+</script>
+{% endblock %}

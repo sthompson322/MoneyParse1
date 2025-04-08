@@ -1,5 +1,5 @@
 from django import forms
-from .models import Income, Transaction
+from .models import Income, Transaction, Budget
 
 CATEGORY_CHOICES = [
     ('Food', 'Food'),
@@ -38,3 +38,12 @@ class IncomeForm(forms.ModelForm):
         super(IncomeForm, self).__init__(*args, **kwargs)
         for field in self.fields.values():
             field.widget.attrs.update({'class': 'form-control'})
+
+
+class BudgetForm(forms.ModelForm):
+    category = forms.ChoiceField(choices=CATEGORY_CHOICES, widget=forms.Select(attrs={'class': 'form-select'}))
+    limit = forms.DecimalField(widget=forms.NumberInput(attrs={'class': 'form-control', 'step': '0.01'}))
+
+    class Meta:
+        model = Budget
+        fields = ['category', 'limit']

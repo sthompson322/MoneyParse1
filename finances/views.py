@@ -1,8 +1,11 @@
+from django.db.models import Sum
+from django.contrib import messages
 from django.shortcuts import render, redirect
 from django.forms import modelformset_factory
 from django.contrib.auth.decorators import login_required
-from .models import Income, Transaction
-from .forms import IncomeForm, TransactionForm
+from .constants import CATEGORY_CHOICES
+from .models import Income, Transaction, Budget
+from .forms import IncomeForm, TransactionForm, BudgetForm
 
 @login_required
 def income_view(request):
@@ -32,6 +35,24 @@ def transactions_view(request):
                     transaction = form.save(commit=False)
                     transaction.user = request.user
                     transaction.save()
+
+                    # Check budget if this is an expense (type=False)
+                    if not transaction.type:
+                        budget = Budget.objects.filter(
+                            user=request.user,
+                            category=transaction.category
+                        ).first()
+                        if budget:
+                            spent = Transaction.objects.filter(
+                                user=request.user,
+                                category=transaction.category,
+                                type=False
+                            ).aggregate(Sum('amount'))['amount__sum'] or 0
+                            if spent > budget.limit:
+                                messages.warning(
+                                    request,
+                                    f"You exceeded your {budget.category} budget (${budget.limit})!"
+                                )
             return redirect('finances.transactions_display')
     else:
         formset = TransactionFormSet(queryset=Transaction.objects.none())
@@ -52,8 +73,71 @@ def transactions_display(request):
 
 @login_required
 def budget_view(request):
-    return render(request, 'finances/budget.html')
+    if request.method == 'POST':
+        if 'delete_id' in request.POST:
+            Budget.objects.filter(id=request.POST['delete_id'], user=request.user).delete()
+            messages.success(request, "Budget deleted!")
+            return redirect('finances.budget')
+
+        elif 'edit_id' in request.POST:
+            budget = Budget.objects.get(id=request.POST['edit_id'], user=request.user)
+            form = BudgetForm(request.POST, instance=budget)
+        else:
+            form = BudgetForm(request.POST)
+
+        if form.is_valid():
+            budget = form.save(commit=False)
+            budget.user = request.user
+            budget.save()
+            messages.success(request, "Budget saved!")
+            return redirect('finances.budget')
+    else:
+        form = BudgetForm()
+
+    budgets = Budget.objects.filter(user=request.user)
+    return render(request, 'finances/budget.html', {
+        'form': form,
+        'budgets': budgets  # Simpler structure for template
+    })
+
+def delete_budget(request, budget_id):
+    Budget.objects.filter(id=budget_id, user=request.user).delete()
+    return redirect('finances.budget')
 
 @login_required
 def reports_view(request):
-    return render(request, 'finances/reports.html')
+    budgets = Budget.objects.filter(user=request.user)
+
+    chart_data = {
+        'labels': [b.category for b in budgets],
+        'limits': [float(b.limit) for b in budgets],
+        'spent': [
+            float(Transaction.objects.filter(
+                user=request.user,
+                category=b.category,
+                type=False
+            ).aggregate(Sum('amount'))['amount__sum'] or 0)
+            for b in budgets
+        ]
+    }
+    budget_data = []
+    for budget in budgets:
+        spent = Transaction.objects.filter(
+            user=request.user,
+            category=budget.category,
+            type=False
+        ).aggregate(Sum('amount'))['amount__sum'] or 0
+
+        budget_data.append({
+            'category': budget.category,
+            'limit': budget.limit,
+            'spent': spent,
+            'remaining': budget.limit - spent,
+            'percent_used': (spent / budget.limit) * 100 if budget.limit > 0 else 0
+        })
+
+    return render(request, 'finances/reports.html', {
+        'chart_data': chart_data,
+        'budget_data': budget_data,
+        'categories': [choice[0] for choice in CATEGORY_CHOICES]
+    })
