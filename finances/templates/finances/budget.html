@@ -1,18 +1,220 @@
 {% extends 'base.html' %}
+{% load static %}
+
 {% block content %}
-<header class="masthead bg-index text-black text-center
-           py-4">
-  <div class="container d-flex align-items-center flex-
-  column pt-2">
-  </div>
-</header>
-<div class="p-3">
-  <div class="container">
-    <div class="row mt-3">
-      <div class="col mx-auto text-center mb-3">
-        <h4>My Budget Plan</h4>
-      </div>
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="mb-0">
+            <i class="bi bi-wallet2 me-2"></i>Budget Management
+        </h2>
+        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createBudgetModal">
+            <i class="bi bi-plus-circle"></i> Create New Budget
+        </button>
     </div>
-  </div>
+
+    <!-- Budget Creation Modal -->
+    <div class="modal fade" id="createBudgetModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form method="POST">
+                    {% csrf_token %}
+                    <div class="modal-header">
+                        <h5 class="modal-title">Create New Budget</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label class="form-label">Category</label>
+                            <select name="category" class="form-select" required>
+                                {% for category in categories %}
+                                <option value="{{ category.0 }}">{{ category.1 }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Monthly Limit ($)</label>
+                            <input type="number" name="limit" class="form-control" 
+                                   step="0.01" min="0.01" required>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-primary">Save Budget</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Budget List -->
+    <div class="row">
+        {% for budget in budgets %}
+        <div class="col-md-6 col-lg-4 mb-4">
+            <div class="card h-100 budget-card {% if budget.percent_used > 100 %}border-danger{% elif budget.percent_used > 80 %}border-warning{% endif %}">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <h5 class="card-title">
+                                <i class="bi bi-{{ budget.icon }} me-2"></i>{{ budget.get_category_display }}
+                            </h5>
+                            <p class="card-subtitle text-muted">Monthly Budget</p>
+                        </div>
+                        <div class="dropdown">
+                            <button class="btn btn-sm btn-outline-secondary dropdown-toggle" 
+                                    type="button" data-bs-toggle="dropdown">
+                                <i class="bi bi-gear"></i>
+                            </button>
+                            <ul class="dropdown-menu">
+                                <li>
+                                    <button class="dropdown-item" 
+                                            data-bs-toggle="modal" 
+                                            data-bs-target="#editBudgetModal"
+                                            data-id="{{ budget.id }}"
+                                            data-category="{{ budget.category }}"
+                                            data-limit="{{ budget.limit }}">
+                                        <i class="bi bi-pencil me-2"></i>Edit
+                                    </button>
+                                </li>
+                                <li>
+                                    <form method="POST" class="d-inline">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="delete_id" value="{{ budget.id }}">
+                                        <button type="submit" class="dropdown-item text-danger">
+                                            <i class="bi bi-trash me-2"></i>Delete
+                                        </button>
+                                    </form>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Progress Bar -->
+                    <div class="progress mt-3" style="height: 20px;">
+                        <div class="progress-bar 
+                            {% if budget.percent_used > 100 %}bg-danger
+                            {% elif budget.percent_used > 80 %}bg-warning
+                            {% else %}bg-success{% endif %}" 
+                            role="progressbar" 
+                            style="width: {{ budget.percent_used }}%"
+                            aria-valuenow="{{ budget.percent_used }}" 
+                            aria-valuemin="0" 
+                            aria-valuemax="100">
+                            {% if budget.percent_used > 30 %}{{ budget.percent_used|floatformat:0 }}%{% endif %}
+                        </div>
+                        {% if budget.percent_used <= 30 %}
+                        <span class="progress-text">{{ budget.percent_used|floatformat:0 }}%</span>
+                        {% endif %}
+                    </div>
+
+                    <!-- Budget Stats -->
+                    <div class="row mt-3">
+                        <div class="col-4 text-center">
+                            <small class="text-muted">Limit</small>
+                            <p class="mb-0 fw-bold">${{ budget.limit|floatformat:2 }}</p>
+                        </div>
+                        <div class="col-4 text-center">
+                            <small class="text-muted">Spent</small>
+                            <p class="mb-0">${{ budget.spent|floatformat:2 }}</p>
+                        </div>
+                        <div class="col-4 text-center">
+                            <small class="text-muted">Remaining</small>
+                            <p class="mb-0 {% if budget.remaining < 0 %}text-danger{% endif %}">
+                                ${{ budget.remaining|floatformat:2 }}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer bg-transparent">
+                    <small class="text-muted">
+                        {% if budget.percent_used > 100 %}
+                        <i class="bi bi-exclamation-triangle-fill text-danger"></i> Budget exceeded!
+                        {% elif budget.percent_used > 80 %}
+                        <i class="bi bi-exclamation-triangle-fill text-warning"></i> Approaching limit
+                        {% else %}
+                        <i class="bi bi-check-circle-fill text-success"></i> On track
+                        {% endif %}
+                    </small>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-12">
+            <div class="alert alert-info text-center">
+                <i class="bi bi-info-circle-fill me-2"></i>
+                No budgets created yet. Click "Create New Budget" to get started.
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Edit Budget Modal -->
+    <div class="modal fade" id="editBudgetModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form method="POST">
+                    {% csrf_token %}
+                    <input type="hidden" name="edit_id" id="editBudgetId">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Edit Budget</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label class="form-label">Category</label>
+                            <input type="text" class="form-control" id="editBudgetCategory" readonly>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Monthly Limit ($)</label>
+                            <input type="number" name="limit" class="form-control" 
+                                   id="editBudgetLimit" step="0.01" min="0.01" required>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-primary">Save Changes</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
 </div>
-{% endblock content %}
+{% endblock %}
+
+{% block scripts %}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+
+<script>
+document.getElementById('editBudgetModal').addEventListener('show.bs.modal', function(event) {
+    const button = event.relatedTarget;
+    document.getElementById('editBudgetId').value = button.dataset.id;
+    document.getElementById('editBudgetCategory').value = button.dataset.category;
+    document.getElementById('editBudgetLimit').value = button.dataset.limit;
+});
+
+const categoryIcons = {
+    'Food': 'cup-hot',
+    'Rent': 'house',
+    'Utilities': 'lightbulb',
+    'Transportation': 'bus-front',
+    'Entertainment': 'controller',
+    'Miscellaneous': 'three-dots'
+};
+</script>
+
+<style>
+.budget-card {
+    transition: transform 0.2s;
+}
+.budget-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+}
+.progress-text {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    line-height: 20px;
+    font-size: 0.75rem;
+}
+</style>
+{% endblock %}
