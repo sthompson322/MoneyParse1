@@ -97,7 +97,8 @@ def budget_view(request):
     budgets = Budget.objects.filter(user=request.user)
     return render(request, 'finances/budget.html', {
         'form': form,
-        'budgets': budgets  # Simpler structure for template
+        'budgets': budgets,
+        'categories': CATEGORY_CHOICES,
     })
 
 def delete_budget(request, budget_id):
