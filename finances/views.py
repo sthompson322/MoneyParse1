@@ -34,6 +34,7 @@ def transactions_view(request):
                 if form.cleaned_data and not form.cleaned_data.get('DELETE'):
                     transaction = form.save(commit=False)
                     transaction.user = request.user
+                    transaction.amount = form.cleaned_data.get('amount')
                     transaction.save()
 
                     # Check budget if this is an expense (type=False)
@@ -43,12 +44,7 @@ def transactions_view(request):
                             category=transaction.category
                         ).first()
                         if budget:
-                            spent = Transaction.objects.filter(
-                                user=request.user,
-                                category=transaction.category,
-                                type=False
-                            ).aggregate(Sum('amount'))['amount__sum'] or 0
-                            if spent > budget.limit:
+                            if budget.spent > budget.limit:
                                 messages.warning(
                                     request,
                                     f"You exceeded your {budget.category} budget (${budget.limit})!"
@@ -95,6 +91,8 @@ def budget_view(request):
         form = BudgetForm()
 
     budgets = Budget.objects.filter(user=request.user)
+    for b in budgets:
+        print(b.category, b.percent_used, b.remaining)
     return render(request, 'finances/budget.html', {
         'form': form,
         'budgets': budgets,
