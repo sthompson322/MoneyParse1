@@ -1,5 +1,5 @@
 from django import forms
-from .models import Income, Transaction, Budget
+from .models import Income, Transaction, Budget, Ticket
 
 CATEGORY_CHOICES = [
     ('Food', 'Food'),
@@ -47,3 +47,14 @@ class BudgetForm(forms.ModelForm):
     class Meta:
         model = Budget
         fields = ['category', 'limit']
+
+
+class TicketForm(forms.ModelForm):
+    class Meta:
+        model = Ticket
+        fields = ['subject', 'message']
+
+    def __init__(self, *args, **kwargs):
+        super(TicketForm, self).__init__(*args, **kwargs)
+        self.fields['subject'].widget.attrs.update({'class': 'form-control'})
+        self.fields['message'].widget = forms.Textarea(attrs={'class': 'form-control', 'rows': 5})

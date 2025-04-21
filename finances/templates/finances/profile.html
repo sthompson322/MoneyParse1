@@ -1,0 +1,79 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4 px-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-10 col-xl-8">
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">Submit Support Ticket</h4>
+                </div>
+                <div class="card-body">
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            {{ form.subject.label_tag }}
+                            {{ form.subject }}
+                        </div>
+                        <div class="mb-3">
+                            {{ form.message.label_tag }}
+                            {{ form.message }}
+                        </div>
+                        <button type="submit" class="btn btn-primary">Submit Ticket</button>
+                    </form>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header bg-secondary text-white">
+                    <h4 class="mb-0">Your Support Tickets</h4>
+                </div>
+                <div class="card-body">
+                    {% if tickets %}
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Subject</th>
+                                        <th>Status</th>
+                                        <th>Date</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for ticket in tickets %}
+                                    <tr>
+                                        <td>{{ ticket.id }}</td>
+                                        <td>{{ ticket.subject }}</td>
+                                        <td>
+                                            <span class="badge
+                                                {% if ticket.status == 'open' %}bg-primary
+                                                {% elif ticket.status == 'in_progress' %}bg-warning
+                                                {% else %}bg-success{% endif %}">
+                                                {{ ticket.get_status_display }}
+                                            </span>
+                                        </td>
+                                        <td>{{ ticket.created_at|date:"M d, Y" }}</td>
+                                        <td class="text-nowrap">
+                                            <a href="{{ ticket.get_edit_url }}" class="btn btn-sm btn-outline-primary">Edit</a>
+                                            <form method="post" action="{{ ticket.get_delete_url }}" class="d-inline">
+                                                {% csrf_token %}
+                                                <button type="submit" class="btn btn-sm btn-outline-danger">
+                                                    Delete
+                                                </button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <p class="mb-0">No tickets submitted yet.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
