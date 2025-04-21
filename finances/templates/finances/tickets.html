@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h2>Admin - Troubleshooting Tickets</h2>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>User</th>
+            <th>Subject</th>
+            <th>Status</th>
+            <th>Created</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for ticket in tickets %}
+        <tr>
+            <td>{{ ticket.id }}</td>
+            <td>{{ ticket.user.username }}</td>
+            <td>{{ ticket.subject }}</td>
+            <td>{{ ticket.get_status_display }}</td>
+            <td>{{ ticket.created_at|date:"Y-m-d H:i" }}</td>
+            <td>
+                <form method="post" action="{% url 'finances.update_ticket_status' ticket.id %}">
+                    {% csrf_token %}
+                    <select name="status" class="form-select">
+                        {% for value, display in ticket.STATUS_CHOICES %}
+                        <option value="{{ value }}" {% if ticket.status == value %}selected{% endif %}>
+                            {{ display }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                    <button type="submit" class="btn btn-sm btn-primary">Update</button>
+                </form>
+            </td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="6">No tickets found.</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

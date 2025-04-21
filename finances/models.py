@@ -1,6 +1,7 @@
 from django.db import models
 from django.db.models import Sum
 from django.contrib.auth.models import User
+from django.urls import reverse
 from .constants import CATEGORY_CHOICES
 
 class Income(models.Model):
@@ -33,7 +34,7 @@ class Budget(models.Model):
     def spent(self):
         return Transaction.objects.filter(category=self.category).aggregate(
             total=Sum('amount')
-        )['total'] or Decimal('0.00')
+        )['total']
 
     @property
     def remaining(self):
@@ -48,3 +49,29 @@ class Budget(models.Model):
 
     def __str__(self):
         return f"{self.category} - ${self.limit} - ${self.spent}"
+
+class Ticket(models.Model):
+    STATUS_CHOICES = [
+        ('open', 'Open'),
+        ('in_progress', 'In Progress'),
+        ('resolved', 'Resolved'),
+    ]
+
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    subject = models.CharField(max_length=200)
+    message = models.TextField()
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='open')
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"Ticket #{self.id} - {self.subject} ({self.status})"
+
+    def get_absolute_url(self):
+        return reverse('finances.profile')
+
+    def get_delete_url(self):
+        return reverse('finances.delete_ticket', args=[self.id])
+
+    def get_edit_url(self):
+        return reverse('finances.edit_ticket', args=[self.id])
