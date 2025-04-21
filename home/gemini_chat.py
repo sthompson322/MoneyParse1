@@ -1,12 +1,9 @@
-import google.generativeai as genai
+from google import genai
 import markdown
 import re
 
 # Configure API key
-genai.configure(api_key="AIzaSyDxpor2viPS9Q4W9Ud1Jzu_cvRFxgebu10")
-
-# Set up the model
-model = genai.GenerativeModel("gemini-pro")
+client = genai.Client(api_key="AIzaSyDxpor2viPS9Q4W9Ud1Jzu_cvRFxgebu10")
 
 def is_finance_related(text):
     keywords = ['money', 'budget', 'spending', 'saving', 'finance', 'income', 'expenses', 'cost', 'save', 'spend']
@@ -22,7 +19,7 @@ def get_gemini_response(user_input):
             "Keep your response detailed but relatively concise... under 2000 characters if possible. "
             f"User: {user_input}"
         )
-        response = model.generate_content(prompt)
+        response = client.models.generate_content(model="gemini-2.0-flash", contents=prompt)
         return markdown.markdown(response.text.strip())
     except Exception as e:
         print("Gemini API error:", e)
