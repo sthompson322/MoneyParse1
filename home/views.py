@@ -23,6 +23,6 @@ def profile(request):
 def chatbot_view(request):
     if request.method == "POST":
         user_input = request.POST.get("message", "")
-        response = get_gemini_response(user_input)
+        response = get_gemini_response(user_input, request.user)
         return JsonResponse({"response": response})
     return render(request, "home/chatbot.html")

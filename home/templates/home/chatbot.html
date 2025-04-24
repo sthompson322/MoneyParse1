@@ -17,7 +17,7 @@
         const input = inputField.value.trim();
         if (!input) return;
 
-        const messages = document.getElementById("messages");
+        const messages = document.getElementById("messagces");
         messages.innerHTML += `<div class="msg user"><strong>You:</strong> ${input}</div>`;
 
         fetch("{% url 'home.chatbot' %}", {
