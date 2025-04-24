@@ -35,7 +35,7 @@ class Budget(models.Model):
     def spent(self):
         return Transaction.objects.filter(user=self.user, category=self.category, type=False).aggregate(
             total=Sum('amount')
-        )['total']
+        )['total'] or Decimal(0.00)
 
     @property
     def remaining(self):
