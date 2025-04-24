@@ -1,5 +1,6 @@
 from django.db import models
 from django.db.models import Sum
+from decimal import Decimal
 from django.contrib.auth.models import User
 from django.urls import reverse
 from .constants import CATEGORY_CHOICES
@@ -32,7 +33,7 @@ class Budget(models.Model):
 
     @property
     def spent(self):
-        return Transaction.objects.filter(category=self.category).aggregate(
+        return Transaction.objects.filter(user=self.user, category=self.category, type=False).aggregate(
             total=Sum('amount')
         )['total']
 

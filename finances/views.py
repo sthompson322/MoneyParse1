@@ -37,18 +37,6 @@ def transactions_view(request):
                     transaction.amount = form.cleaned_data.get('amount')
                     transaction.save()
 
-                    # Check budget if this is an expense (type=False)
-                    if not transaction.type:
-                        budget = Budget.objects.filter(
-                            user=request.user,
-                            category=transaction.category
-                        ).first()
-                        if budget:
-                            if budget.spent > budget.limit:
-                                messages.warning(
-                                    request,
-                                    f"You exceeded your {budget.category} budget (${budget.limit})!"
-                                )
             return redirect('finances.transactions_display')
     else:
         formset = TransactionFormSet(queryset=Transaction.objects.none())
@@ -61,10 +49,14 @@ def transactions_display(request):
     transactions = Transaction.objects.filter(user=request.user).order_by('-date')
 
     total_spent = sum(t.amount for t in transactions if not t.type)
+    total_income = sum(t.amount for t in transactions if t.type)
+    net_balance = total_income - total_spent
 
     return render(request, 'finances/transactions_display.html', {
         'transactions': transactions,
         'total_spent': total_spent,
+        'total_income': total_income,
+        'net_balance': net_balance,
     })
 
 @login_required
