@@ -80,12 +80,21 @@ def budget_view(request):
         else:
             form = BudgetForm(request.POST)
 
+        budgets = Budget.objects.filter(user=request.user)
+        exists = False
         if form.is_valid():
-            budget = form.save(commit=False)
-            budget.user = request.user
-            budget.save()
-            messages.success(request, "Budget created!")
-            return redirect('finances.budget')
+            for b in budgets:
+                if b.category == form.cleaned_data['category']:
+                    b.limit += Decimal(form.cleaned_data['limit'])
+                    b.save()
+                    exists = True
+
+            if not exists:
+                budget = form.save(commit=False)
+                budget.user = request.user
+                budget.save()
+                messages.success(request, "Budget created!")
+        return redirect('finances.budget')
     else:
         form = BudgetForm()
 
