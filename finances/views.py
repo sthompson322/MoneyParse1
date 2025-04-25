@@ -6,6 +6,8 @@ from django.contrib.auth.decorators import login_required
 from .constants import CATEGORY_CHOICES
 from .models import Income, Transaction, Budget
 from .forms import IncomeForm, TransactionForm, BudgetForm
+from .models import Ticket
+from .forms import TicketForm
 from django.db.models import Sum
 from decimal import Decimal
 
@@ -73,10 +75,6 @@ def budget_view(request):
             Budget.objects.filter(id=request.POST['delete_id'], user=request.user).delete()
             messages.success(request, "Budget deleted!")
             return redirect('finances.budget')
-
-        elif 'edit_id' in request.POST:
-            budget = Budget.objects.get(id=request.POST['edit_id'], user=request.user)
-            form = BudgetForm(request.POST, instance=budget)
         else:
             form = BudgetForm(request.POST)
 
@@ -84,7 +82,7 @@ def budget_view(request):
             budget = form.save(commit=False)
             budget.user = request.user
             budget.save()
-            messages.success(request, "Budget saved!")
+            messages.success(request, "Budget created!")
             return redirect('finances.budget')
     else:
         form = BudgetForm()
@@ -102,22 +100,12 @@ def delete_budget(request, budget_id):
     Budget.objects.filter(id=budget_id, user=request.user).delete()
     return redirect('finances.budget')
 
+
 @login_required
 def reports_view(request):
     budgets = Budget.objects.filter(user=request.user)
 
-    chart_data = {
-        'labels': [b.category for b in budgets],
-        'limits': [float(b.limit) for b in budgets],
-        'spent': [
-            float(Transaction.objects.filter(
-                user=request.user,
-                category=b.category,
-                type=False
-            ).aggregate(Sum('amount'))['amount__sum'] or 0)
-            for b in budgets
-        ]
-    }
+    # Prepare data for template
     budget_data = []
     for budget in budgets:
         spent = Transaction.objects.filter(
@@ -128,22 +116,16 @@ def reports_view(request):
 
         budget_data.append({
             'category': budget.category,
-            'limit': budget.limit,
-            'spent': spent,
-            'remaining': budget.limit - spent,
-            'percent_used': (spent / budget.limit) * 100 if budget.limit > 0 else 0
+            'limit': float(budget.limit),
+            'spent': float(spent),
+            'remaining': float(budget.limit - spent),
+            'percent_used': (float(spent) / float(budget.limit)) * 100 if budget.limit > 0 else 0
         })
 
     return render(request, 'finances/reports.html', {
-        'chart_data': chart_data,
         'budget_data': budget_data,
         'categories': [choice[0] for choice in CATEGORY_CHOICES]
     })
-
-
-from .models import Ticket
-from .forms import TicketForm
-
 
 @login_required
 def profile_view(request):
@@ -179,7 +161,6 @@ def update_ticket_status(request, ticket_id):
             messages.success(request, f"Ticket #{ticket_id} status updated to {new_status}")
     return redirect('finances.admin_tickets')
 
-
 @login_required
 def edit_ticket(request, ticket_id):
     ticket = get_object_or_404(Ticket, id=ticket_id, user=request.user)
@@ -197,7 +178,6 @@ def edit_ticket(request, ticket_id):
         'form': form,
         'ticket': ticket
     })
-
 
 @login_required
 def delete_ticket(request, ticket_id):
