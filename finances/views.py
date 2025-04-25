@@ -85,9 +85,10 @@ def budget_view(request):
         if form.is_valid():
             for b in budgets:
                 if b.category == form.cleaned_data['category']:
-                    b.limit += Decimal(form.cleaned_data['limit'])
+                    b.limit = Decimal(form.cleaned_data['limit'])
                     b.save()
                     exists = True
+                    messages.success(request, "Budget updated!")
 
             if not exists:
                 budget = form.save(commit=False)
