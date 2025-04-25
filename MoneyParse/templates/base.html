@@ -12,6 +12,7 @@
   </head>
 
   <body>
+  <div class="d-flex flex-column min-vh-100">
     <!-- Header -->
     <nav class="p-3 navbar navbar-dark bg-success navbar-expand-lg">
       <div class="container">
@@ -45,7 +46,7 @@
     </nav>
     <!-- Header -->
 
-    <div>
+    <div class = "flex-grow-1">
       {% block content %}
       {% endblock content %}
     </div>
@@ -70,9 +71,9 @@
           <div class="col-md-5 offset-md-1 mb-4">
             <h5 class="text-uppercase">CONTACT</h5>
             <hr class="mb-2 mt-0" style="width: 60px; background-color: #ffffff; height: 2px" />
-            <p><i class="fas fa-home me-2"></i> 150-2345 Tokyo-to, Japan</p>
+            <p><i class="fas fa-home me-2"></i> 801 Atlantic Drive NW Atlanta, GA</p>
             <p><i class="fas fa-envelope me-2"></i> info@moneyparse.com</p>
-            <p><i class="fas fa-phone me-2"></i> +81 03-3333-3333</p>
+            <p><i class="fas fa-phone me-2"></i> +1 303-333-3333</p>
           </div>
         </div>
       </div>
@@ -80,9 +81,10 @@
 
     <section class="py-1 ms-footer-bottom bg-dark text-white">
       <div class="container text-center">
-        <span>© Copyright - 2024</span>
+        <span>© Copyright - 2025</span>
       </div>
     </section>
+  </div>
     <!-- Footer -->
     {% if user.is_authenticated %}
     <!-- Chatbot Popup Button -->
@@ -107,7 +109,6 @@
       </div>
     </div>
     {% endif %}
-
   </body>
 </html>
 
@@ -251,5 +252,20 @@
   font-weight: normal;
 }
 
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+ }
+
+.min-vh-100 {
+  min-height: 100vh;
+}
+
+.flex-grow-1 {
+  flex: 1 1 auto;
+}
 
 </style>

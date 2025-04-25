@@ -13,15 +13,17 @@ from decimal import Decimal
 
 @login_required
 def income_view(request):
+    existing_income = Income.objects.filter(user=request.user).first()
+
     if request.method == 'POST':
-        form = IncomeForm(request.POST)
+        form = IncomeForm(request.POST, instance=existing_income)
         if form.is_valid():
             income = form.save(commit=False)
             income.user = request.user
             income.save()
             return redirect('finances.transactions')
     else:
-        form = IncomeForm()
+        form = IncomeForm(instance=existing_income)
 
     return render(request, 'finances/income.html', {'form': form})
 
