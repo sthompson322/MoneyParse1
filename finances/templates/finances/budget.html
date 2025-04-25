@@ -33,7 +33,7 @@
                         </div>
                         <div class="mb-3">
                             <label class="form-label">Monthly Limit ($)</label>
-                            <input type="number" name="limit" class="form-control" 
+                            <input type="number" name="limit" class="form-control"
                                    step="0.01" min="0.01" required>
                         </div>
                     </div>
@@ -60,14 +60,14 @@
                             <p class="card-subtitle text-muted">Monthly Budget</p>
                         </div>
                         <div class="dropdown">
-                            <button class="btn btn-sm btn-outline-secondary dropdown-toggle" 
+                            <button class="btn btn-sm btn-outline-secondary dropdown-toggle"
                                     type="button" data-bs-toggle="dropdown">
                                 <i class="bi bi-gear"></i>
                             </button>
                             <ul class="dropdown-menu">
                                 <li>
-                                    <button class="dropdown-item" 
-                                            data-bs-toggle="modal" 
+                                    <button class="dropdown-item"
+                                            data-bs-toggle="modal"
                                             data-bs-target="#editBudgetModal"
                                             data-id="{{ budget.id }}"
                                             data-category="{{ budget.category }}"
@@ -90,14 +90,14 @@
 
                     <!-- Progress Bar -->
                     <div class="progress mt-3" style="height: 20px;">
-                        <div class="progress-bar 
+                        <div class="progress-bar
                             {% if budget.percent_used > 100 %}bg-danger
                             {% elif budget.percent_used > 80 %}bg-warning
-                            {% else %}bg-success{% endif %}" 
-                            role="progressbar" 
+                            {% else %}bg-success{% endif %}"
+                            role="progressbar"
                             style="width: {{ budget.percent_used }}%"
-                            aria-valuenow="{{ budget.percent_used }}" 
-                            aria-valuemin="0" 
+                            aria-valuenow="{{ budget.percent_used }}"
+                            aria-valuemin="0"
                             aria-valuemax="100">
                             {% if budget.percent_used > 30 %}{{ budget.percent_used|floatformat:0 }}%{% endif %}
                         </div>

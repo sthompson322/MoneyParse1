@@ -6,6 +6,8 @@ from django.contrib.auth.decorators import login_required
 from .constants import CATEGORY_CHOICES
 from .models import Income, Transaction, Budget
 from .forms import IncomeForm, TransactionForm, BudgetForm
+from django.db.models import Sum
+from decimal import Decimal
 
 @login_required
 def income_view(request):
@@ -46,6 +48,9 @@ def transactions_view(request):
 
 @login_required
 def transactions_display(request):
+    annual_income = Income.objects.filter(user=request.user).aggregate(Sum('amount'))['amount__sum'] or Decimal("0.00")
+    monthly_budgeted_income = (annual_income / 12).quantize(Decimal('0.01')) if annual_income else Decimal("0.00")
+
     transactions = Transaction.objects.filter(user=request.user).order_by('-date')
 
     total_spent = sum(t.amount for t in transactions if not t.type)
@@ -57,6 +62,8 @@ def transactions_display(request):
         'total_spent': total_spent,
         'total_income': total_income,
         'net_balance': net_balance,
+        'annual_income': annual_income,
+        'monthly_budgeted_income': monthly_budgeted_income,
     })
 
 @login_required
