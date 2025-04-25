@@ -60,6 +60,7 @@ def transactions_display(request):
     total_spent = sum(t.amount for t in transactions if not t.type)
     total_income = sum(t.amount for t in transactions if t.type)
     net_balance = total_income - total_spent
+    spending_limit = monthly_budgeted_income + total_income
 
     return render(request, 'finances/transactions_display.html', {
         'transactions': transactions,
@@ -68,6 +69,7 @@ def transactions_display(request):
         'net_balance': net_balance,
         'annual_income': annual_income,
         'monthly_budgeted_income': monthly_budgeted_income,
+        'spending_limit': spending_limit,
     })
 
 @login_required
