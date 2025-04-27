@@ -20,7 +20,7 @@
 
     <!-- Summary Cards -->
     <div class="row mb-4">
-        <div class="col-md-4 mb-3">
+        <div class="col-md-3 mb-3">
             <div class="card h-100 shadow-sm">
                 <div class="card-body">
                     <h5 class="card-title text-muted">Total Spent</h5>
@@ -28,7 +28,7 @@
                 </div>
             </div>
         </div>
-        <div class="col-md-4 mb-3">
+        <div class="col-md-3 mb-3">
             <div class="card h-100 shadow-sm">
                 <div class="card-body">
                     <h5 class="card-title text-muted">Total Received</h5>
@@ -41,7 +41,7 @@
                 </div>
             </div>
         </div>
-        <div class="col-md-4 mb-3">
+        <div class="col-md-3 mb-3">
             <div class="card h-100 shadow-sm">
                 <div class="card-body">
                     <h5 class="card-title text-muted">Net Balance</h5>
@@ -51,12 +51,15 @@
                 </div>
             </div>
         </div>
-        <div class="col-md-4 mb-3">
+        <div class="col-md-3 mb-3">
             <div class="card h-100 shadow-sm">
                 <div class="card-body">
                     <h5 class="card-title text-muted">Spending Limit</h5>
                     <p class="display-6">
                         ${{ spending_limit|floatformat:2 }}
+                    </p>
+                    <p class="text-muted mb-0" style="font-size: 0.75rem;">
+                        Recommended: ${{ monthly_budgeted_income|floatformat:2 }} (est. monthly income)
                     </p>
                 </div>
             </div>

@@ -8,6 +8,7 @@ from .constants import CATEGORY_CHOICES
 class Income(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     amount = models.DecimalField(max_digits=10, decimal_places=2)
+    custom_monthly_limit = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True, help_text="Optional custom monthly spending limit")
 
     def __str__(self):
         return f"Income - ${self.amount}"
@@ -50,6 +51,7 @@ class Budget(models.Model):
 
     def __str__(self):
         return f"{self.category} - ${self.limit} - ${self.spent}"
+
 
 class Ticket(models.Model):
     STATUS_CHOICES = [

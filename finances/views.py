@@ -54,13 +54,12 @@ def transactions_view(request):
 def transactions_display(request):
     annual_income = Income.objects.filter(user=request.user).aggregate(Sum('amount'))['amount__sum'] or Decimal("0.00")
     monthly_budgeted_income = (annual_income / 12).quantize(Decimal('0.01')) if annual_income else Decimal("0.00")
-
     transactions = Transaction.objects.filter(user=request.user).order_by('-date')
-
     total_spent = sum(t.amount for t in transactions if not t.type)
     total_income = sum(t.amount for t in transactions if t.type)
     net_balance = total_income - total_spent
-    spending_limit = monthly_budgeted_income + total_income
+    custom_limit = Income.objects.get(user=request.user).custom_monthly_limit if Income.objects.get(user=request.user).custom_monthly_limit else None
+    spending_limit = custom_limit if custom_limit else monthly_budgeted_income
 
     return render(request, 'finances/transactions_display.html', {
         'transactions': transactions,
