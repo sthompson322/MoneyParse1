@@ -32,12 +32,13 @@ class TransactionForm(forms.ModelForm):
 class IncomeForm(forms.ModelForm):
     class Meta:
         model = Income
-        fields = ['amount']
+        fields = ['amount', 'optional_custom_monthly_spending_limit']
 
     def __init__(self, *args, **kwargs):
         super(IncomeForm, self).__init__(*args, **kwargs)
         for field in self.fields.values():
             field.widget.attrs.update({'class': 'form-control'})
+
 
 
 class BudgetForm(forms.ModelForm):
@@ -47,6 +48,7 @@ class BudgetForm(forms.ModelForm):
     class Meta:
         model = Budget
         fields = ['category', 'limit']
+
 
 
 class TicketForm(forms.ModelForm):
