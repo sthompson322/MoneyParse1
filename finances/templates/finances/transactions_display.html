@@ -55,12 +55,14 @@
             <div class="card h-100 shadow-sm">
                 <div class="card-body">
                     <h5 class="card-title text-muted">Spending Limit</h5>
-                    <p class="display-6">
+                    <p class="display-6 {% if total_spent > spending_limit %}text-danger{% else %}text-muted{% endif %}">
                         ${{ spending_limit|floatformat:2 }}
                     </p>
-                    <p class="text-muted mb-0" style="font-size: 0.75rem;">
-                        Recommended: ${{ monthly_budgeted_income|floatformat:2 }} (est. monthly income)
+                    {% if total_spent > spending_limit %}
+                    <p class="text-muted mb-0 text-danger" style="font-size: 0.95rem;">
+                        MONTHLY LIMIT EXCEEDED
                     </p>
+                    {% endif %}
                 </div>
             </div>
         </div>
@@ -114,7 +116,7 @@
 
     <div class="text-center mt-5">
         <a href="{% url 'finances.income' %}" class="btn btn-primary mb-2">
-            <i class="bi bi-cash-coin me-1"></i> Add or Update Annual Income
+            <i class="bi bi-cash-coin me-1"></i> Add or Update Annual Income or Custom Spending Limit
         </a>
     </div>
 

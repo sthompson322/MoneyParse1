@@ -58,7 +58,7 @@ def transactions_display(request):
     total_spent = sum(t.amount for t in transactions if not t.type)
     total_income = sum(t.amount for t in transactions if t.type)
     net_balance = total_income - total_spent
-    custom_limit = Income.objects.get(user=request.user).custom_monthly_limit if Income.objects.get(user=request.user).custom_monthly_limit else None
+    custom_limit = Income.objects.get(user=request.user).optional_custom_monthly_spending_limit if Income.objects.get(user=request.user).optional_custom_monthly_spending_limit else None
     spending_limit = custom_limit if custom_limit else monthly_budgeted_income
 
     return render(request, 'finances/transactions_display.html', {
