@@ -32,7 +32,7 @@ class TransactionForm(forms.ModelForm):
 class IncomeForm(forms.ModelForm):
     class Meta:
         model = Income
-        fields = ['amount', 'optional_custom_monthly_spending_limit']
+        fields = ['amount']
 
     def __init__(self, *args, **kwargs):
         super(IncomeForm, self).__init__(*args, **kwargs)

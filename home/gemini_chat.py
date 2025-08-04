@@ -1,4 +1,4 @@
-from google import genai
+import google.generativeai as genai
 import markdown
 import re
 from finances.models import Transaction, Budget, Income
@@ -6,7 +6,8 @@ from django.db.models import Sum
 from decimal import Decimal
 
 # Configure API key
-client = genai.Client(api_key="AIzaSyDxpor2viPS9Q4W9Ud1Jzu_cvRFxgebu10")
+genai.configure(api_key="AIzaSyDxpor2viPS9Q4W9Ud1Jzu_cvRFxgebu10")
+model = genai.GenerativeModel("gemini-1.5-flash")
 
 def is_finance_related(text):
     keywords = ['money', 'budget', 'spending', 'saving', 'finance', 'income', 'expenses', 'cost', 'save', 'spend']
@@ -57,7 +58,8 @@ def get_gemini_response(user_input, user):
         )
 
         # Gemini call
-        response = client.models.generate_content(model="gemini-2.0-flash", contents=prompt)
+        response = model.generate_content(prompt)
+        #response = client.models.generate_content(model="gemini-1.5-flash", contents=prompt)
         return markdown.markdown(response.text.strip())
 
     except Exception as e:

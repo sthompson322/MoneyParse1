@@ -8,7 +8,7 @@ from .constants import CATEGORY_CHOICES
 class Income(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     amount = models.DecimalField(max_digits=10, decimal_places=2)
-    optional_custom_monthly_spending_limit = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+    #optional_custom_monthly_spending_limit = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
 
     def __str__(self):
         return f"Income - ${self.amount}"
