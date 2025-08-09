@@ -8,6 +8,8 @@ habits. By offering insights into spending patterns, MoneyParce is a valuable to
 users looking to save money. Additionally, it provides personalized financial advice
 based on individual spending habits, helping users achieve better financial
 management.
+
+Built using Django, Python, Bootstrap, HTML, MySQL
 --------------
 **Features:**
 
