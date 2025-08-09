@@ -1,6 +1,5 @@
 MoneyParse Financial Management App
 ------------
-**Description:**
 MoneyParce is a web-based application designed to help users manage their personal
 finances in a simple and organized manner. It allows users to record their income and
 expenses, categorize transactions, and generate financial reports. The platform also
